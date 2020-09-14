@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DealAppAnd002</string>
+    <string name="title_activity_main_page">MainActivity</string>
+    <string name="title_home">홈</string>
+    <string name="title_dashboard">글쓰기</string>
+    <string name="title_notifications">내글</string>
+</resources>
