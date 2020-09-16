@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
                                 Log.d(TAG,"비밀번호 잉치")
                                 var intent = Intent(this,MainPage::class.java)
                                 startActivity(intent)
+                            }
+                            else{
+                                Toast.makeText(applicationContext, "비밀번호 오류", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
