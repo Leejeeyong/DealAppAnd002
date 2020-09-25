@@ -2,9 +2,11 @@ package com.example.dealappand002
 
 import android.R.*
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.ViewUtils
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
+import com.example.dealappand002.ui.home.HomeFragment
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_detailview.*
 import kotlinx.android.synthetic.main.pagerimageview.view.*
 import kotlinx.android.synthetic.main.rowlayout.view.*
@@ -28,6 +33,7 @@ class detailview : AppCompatActivity() {
     var arrayAllProdPrice: Array<Int> = Array(255, { i -> 0 })
     var arrayState: Array<Int> = Array(255, { i -> 0 })
     var index = 0
+    val TAG = "detailview"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,33 +41,46 @@ class detailview : AppCompatActivity() {
 
         index = intent.getIntExtra("index",0)
 
+        // Access a Cloud Firestore instance from your Activity
+        val db = FirebaseFirestore.getInstance()
 
-        arrayAllProdTitle.set(0, "첫번째 타이틀fdsfdsafdsfdsfdsfdsfdsfdsfsadfdsfdsaf")
-        arrayAllProdWriter.set(0, "이지용")
-        arrayAllProdPrice.set(0, 2000)
-        arrayAllProdDate.set(0, "20200808")
-        arrayState.set(0, 1)
+        db.collection("TableData")
+            .orderBy("Date", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                var i = 0
 
-        arrayAllProdTitle.set(1, "두번 타이틀fdsfadsfdsafdsafdsfdsafsadfdsfdsafsdafsdfsdaf\nfsdafdsfasdf")
-        arrayAllProdWriter.set(1, "째어용")
-        arrayAllProdPrice.set(1, 300000)
-        arrayAllProdDate.set(1, "20200808")
-        arrayState.set(1, 0)
-
-
-        TitletextView.text = arrayAllProdTitle.get(index)
-        WritertextView.text = arrayAllProdWriter.get(index) + "  작성일 : " + arrayAllProdDate.get(index)
-
-        if(arrayState[index] == 1){
-            PricetextView.text = "(판매중)가격 : "+arrayAllProdPrice.get(index).toString() + "원"
-        }
-        else{
-            PricetextView.text = "(판매완료)"
-        }
+                for (document in result) {
+                    Log.d(TAG, "data" + document.getString("Title"))
+                    arrayAllProdTitle.set(i, document.getString("Title").toString())
+                    arrayAllProdWriter.set(i, document.getString("Writer").toString())
+                    document.getDouble("Price")?.toInt()?.let { arrayAllProdPrice.set(i, it) }
+                    arrayAllProdDate.set(i, document.getString("Date").toString())
+                    document.getDouble("State")?.toInt()?.let { arrayState.set(i, it) }
+                    i += 1
+                }
 
 
+                TitletextView.text = arrayAllProdTitle.get(index)
+                WritertextView.text = arrayAllProdWriter.get(index) + "  작성일 : " + arrayAllProdDate.get(index)
 
-        viewPager2.adapter = PagerAdpater(this)
+                if(arrayState[index] == 1){
+                    PricetextView.text = "(판매중)가격 : "+arrayAllProdPrice.get(index).toString() + "원"
+                }
+                else{
+                    PricetextView.text = "(판매완료)"
+                }
+
+
+
+                viewPager2.adapter = PagerAdpater(this)
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents.", exception)
+            }
+
+
+
 
 
     }

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportActionBar?.hide()
+
 
         // Access a Cloud Firestore instance from your Activity
         val db = FirebaseFirestore.getInstance()
@@ -34,9 +37,14 @@ class MainActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { result ->
                     for (document in result) {
+                        hideKeyboard()
+
                         if(editTextID.text.toString() == document.getString("ID")){
+
                             Log.d(TAG,"아이디 잉치")
+
                             if(editTextPassword.text.toString() == document.getString("PASSWORD")){
+
                                 Log.d(TAG,"비밀번호 잉치")
                                 var intent = Intent(this,MainPage::class.java)
                                 startActivity(intent)
@@ -52,6 +60,17 @@ class MainActivity : AppCompatActivity() {
                 }
 
         }
+
+
+        mainactLayout.setOnClickListener {
+            hideKeyboard()
+        }
+    }
+
+    fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(editTextID.windowToken,  0)
+        imm.hideSoftInputFromWindow(editTextPassword.windowToken,  0)
     }
 
 

@@ -3,19 +3,20 @@ package com.example.dealappand002.ui.home
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ImageView
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.dealappand002.MainPage
 import com.example.dealappand002.R
 import com.example.dealappand002.detailview
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.activity_main.*
 
 class HomeFragment : Fragment() {
 
@@ -25,6 +26,7 @@ class HomeFragment : Fragment() {
     var arrayAllProdDate: Array<String> = Array(255, { i -> "" })
     var arrayAllProdPrice: Array<Int> = Array(255, { i -> 0 })
     var arrayState: Array<Int> = Array(255, { i -> 0 })
+    private val TAG = "HomeFrament"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,30 +38,44 @@ class HomeFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         val listView: ListView = root.findViewById(R.id.listviewAllProd)
 
-        arrayAllProdTitle.set(0, "첫번째 타이틀")
-        arrayAllProdWriter.set(0, "이지용")
-        arrayAllProdPrice.set(0, 2000)
-        arrayAllProdDate.set(0, "20200808")
-        arrayState.set(0, 1)
 
-        arrayAllProdTitle.set(1, "두번 타이틀")
-        arrayAllProdWriter.set(1, "째어용")
-        arrayAllProdPrice.set(1, 300000)
-        arrayAllProdDate.set(1, "20200808")
-        arrayState.set(1, 0)
+        // Access a Cloud Firestore instance from your Activity
+        val db = FirebaseFirestore.getInstance()
 
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            listView.adapter = this.context?.let { it1 -> MyAdapoter(it1, arrayAllProdTitle,arrayAllProdWriter,arrayAllProdDate,arrayAllProdPrice) }
-
-            listView.setOnItemClickListener { adapterView, view, i, l ->
-                activity?.let{
-                    val iT = Intent(context, detailview::class.java)
-                    iT.putExtra("index",i)
-                    startActivity(iT)
+        db.collection("TableData")
+            .orderBy("Date", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                var i = 0
+                for (document in result) {
+                    Log.d(TAG, "data" + i.toString() + "\n" + document.getString("Title"))
+                    arrayAllProdTitle.set(i, document.getString("Title").toString())
+                    arrayAllProdWriter.set(i, document.getString("Writer").toString())
+                    document.getDouble("Price")?.toInt()?.let { arrayAllProdPrice.set(i, it) }
+                    arrayAllProdDate.set(i, document.getString("Date").toString())
+                    document.getDouble("State")?.toInt()?.let { arrayState.set(i, it) }
+                    i++
                 }
+                homeViewModel.text.observe(viewLifecycleOwner, Observer {
+                    listView.adapter = this.context?.let { it1 -> MyAdapoter(it1, arrayAllProdTitle,arrayAllProdWriter,arrayAllProdDate,arrayAllProdPrice) }
+
+                    listView.setOnItemClickListener { adapterView, view, i, l ->
+                        activity?.let{
+                            val iT = Intent(context, detailview::class.java)
+                            iT.putExtra("index",i)
+                            startActivity(iT)
+                        }
+                    }
+
+                })
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents.", exception)
             }
 
-        })
+
+
+
         return root
     }
 
