@@ -39,34 +39,6 @@
         app:layout_constraintTop_toBottomOf="@+id/EditTitleUpload" />
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
-        android:text="이미지"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:text="이미지이름"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
-
-    <Button
         android:id="@+id/registDeal_button"
         android:layout_width="0dp"
         android:layout_height="50dp"
@@ -79,5 +51,63 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButton1"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
+
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintStart_toEndOf="@+id/imageButton1"
+        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
+
+    <ImageButton
+        android:id="@+id/imageButton3"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintStart_toEndOf="@+id/imageButton2"
+        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
+
+    <ImageButton
+        android:id="@+id/imageButton4"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintStart_toEndOf="@+id/imageButton3"
+        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
+
+    <ImageButton
+        android:id="@+id/imageButton5"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="31dp"
+        android:layout_marginRight="31dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageButton4"
+        app:layout_constraintTop_toBottomOf="@+id/EditPriceUpload" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

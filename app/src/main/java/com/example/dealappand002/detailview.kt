@@ -12,13 +12,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.ViewUtils
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
+import com.bumptech.glide.Glide
 import com.example.dealappand002.ui.home.HomeFragment
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_detailview.*
 import kotlinx.android.synthetic.main.pagerimageview.view.*
 import kotlinx.android.synthetic.main.rowlayout.view.*
@@ -38,6 +42,7 @@ class detailview : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detailview)
+        supportActionBar?.hide()
 
         index = intent.getIntExtra("index",0)
 
@@ -73,7 +78,7 @@ class detailview : AppCompatActivity() {
 
 
 
-                viewPager2.adapter = PagerAdpater(this)
+                viewPager2.adapter = PagerAdpater(this,arrayAllProdDate, index)
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
@@ -86,7 +91,10 @@ class detailview : AppCompatActivity() {
     }
 
 
-    private class PagerAdpater(private val context: Context): PagerAdapter(){
+    private class PagerAdpater(private val context: Context, arrayDate: Array<String>, index : Int): PagerAdapter(){
+        private val marrayDate: Array<String>
+        private val mindex: Int
+        private val mContext: Context
 
         val arrayImage = arrayOf(
             R.drawable.ic_home_black_24dp,
@@ -102,6 +110,11 @@ class detailview : AppCompatActivity() {
             Color.GREEN,
             Color.YELLOW
         )
+        init {
+            marrayDate = arrayDate
+            mindex = index
+            mContext = context
+        }
 
         override fun getCount(): Int {
             return 5
@@ -114,9 +127,20 @@ class detailview : AppCompatActivity() {
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val layoutInflater = LayoutInflater.from(container.context)
             val view = layoutInflater.inflate(R.layout.pagerimageview, container, false)
-            val imageView = view.findViewById<ImageView>(R.id.imageView)
+            val imageView = view.findViewById<View>(R.id.imageView) as ImageView
 
-            imageView.setImageResource(arrayImage[position])
+
+            val storage = FirebaseStorage.getInstance()
+            // Create a reference to a file from a Google Cloud Storage URI
+            val gsReference = storage.getReference().child(marrayDate.get(mindex) + "/" + (position+1).toString())
+
+            gsReference.getDownloadUrl().addOnSuccessListener(OnSuccessListener<Any> { downloadUrl ->
+                Glide.with(mContext)
+                    .load(downloadUrl.toString())
+                    .into(imageView)
+            })
+
+            //imageView.setImageResource(R.drawable.ic_home_black_24dp)
             view.setBackgroundColor(arraycolor[position])
 
             container.addView(view)
@@ -127,6 +151,7 @@ class detailview : AppCompatActivity() {
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
             container.removeView(`object` as View?)
         }
+
 
     }
 

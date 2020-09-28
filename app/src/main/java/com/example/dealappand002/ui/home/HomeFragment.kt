@@ -7,16 +7,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.BaseAdapter
+import android.widget.ImageView
+import android.widget.ListView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.dealappand002.MainPage
+import com.bumptech.glide.Glide
 import com.example.dealappand002.R
 import com.example.dealappand002.detailview
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.firebase.storage.FirebaseStorage
+
 
 class HomeFragment : Fragment() {
 
@@ -57,12 +62,21 @@ class HomeFragment : Fragment() {
                     i++
                 }
                 homeViewModel.text.observe(viewLifecycleOwner, Observer {
-                    listView.adapter = this.context?.let { it1 -> MyAdapoter(it1, arrayAllProdTitle,arrayAllProdWriter,arrayAllProdDate,arrayAllProdPrice) }
+                    listView.adapter = this.context?.let { it1 ->
+                        MyAdapoter(
+                            it1,
+                            arrayAllProdTitle,
+                            arrayAllProdWriter,
+                            arrayAllProdDate,
+                            arrayAllProdPrice,
+                            arrayState
+                        )
+                    }
 
                     listView.setOnItemClickListener { adapterView, view, i, l ->
-                        activity?.let{
+                        activity?.let {
                             val iT = Intent(context, detailview::class.java)
-                            iT.putExtra("index",i)
+                            iT.putExtra("index", i)
                             startActivity(iT)
                         }
                     }
@@ -81,13 +95,21 @@ class HomeFragment : Fragment() {
 
 
 
-    private class MyAdapoter(context: Context, arrayTitle: Array<String>, arrayWriter: Array<String>, arrayDate: Array<String>, arrayPrice: Array<Int>) : BaseAdapter() {
+    private class MyAdapoter(
+        context: Context,
+        arrayTitle: Array<String>,
+        arrayWriter: Array<String>,
+        arrayDate: Array<String>,
+        arrayPrice: Array<Int>,
+        arrayState: Array<Int>
+    ) : BaseAdapter() {
         private val mContext: Context
         private val TAG = "HomeFragment_Adapter"
         private val marrayTitle: Array<String>
         private val marrayWriter: Array<String>
         private val marrayDate: Array<String>
         private val marrayPrice: Array<Int>
+        private val marrayState: Array<Int>
 
 
         init {
@@ -96,6 +118,7 @@ class HomeFragment : Fragment() {
             marrayWriter = arrayWriter
             marrayDate = arrayDate
             marrayPrice = arrayPrice
+            marrayState = arrayState
         }
 
         override fun getCount(): Int {
@@ -134,13 +157,27 @@ class HomeFragment : Fragment() {
             val dateText: TextView = rowMain.findViewById(R.id.DateTextView)
             val priceText: TextView = rowMain.findViewById(R.id.PriceTextView)
 
+            val storage = FirebaseStorage.getInstance()
+            // Create a reference to a file from a Google Cloud Storage URI
+            val gsReference = storage.getReference().child(marrayDate.get(p0)+"/1")
             image.setImageResource(R.drawable.ic_home_black_24dp)
+
+            gsReference.getDownloadUrl().addOnSuccessListener(OnSuccessListener<Any> { downloadUrl ->
+                Glide.with(mContext)
+                    .load(downloadUrl.toString())
+                    .into(image)
+            })
+
             titleText.text = marrayTitle.get(p0)
             writerText.text = marrayWriter.get(p0)
             dateText.text = marrayDate.get(p0)
-            priceText.text = marrayPrice.get(p0).toString() + "원"
 
-
+            if(marrayState.get(p0) == 1){
+                priceText.text = marrayPrice.get(p0).toString() + "원"
+            }
+            else {
+                priceText.text = "판매완료"
+            }
 
             return rowMain
         }
